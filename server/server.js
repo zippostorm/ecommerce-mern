@@ -3,10 +3,11 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
+import authRouter from "./routes/auth/auth.route.js";
 
 mongoose
   .connect(
-    "mongodb+srv://zippostorm:Nikitas203@ecommerce-mern.po1v9.mongodb.net/"
+    "mongodb+srv://zippostorm:Nikitas203@ecommerce-mern.po1v9.mongodb.net/ecommerce-mern"
   )
   .then(() => console.log("MongoDB connected"))
   .catch((error) => console.log(error));
@@ -31,5 +32,6 @@ app.use(
 
 app.use(cookieParser());
 app.use(express.json());
+app.use("/api/auth", authRouter);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
