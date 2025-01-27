@@ -26,6 +26,11 @@ const AuthRegister = () => {
           title: data?.payload?.message,
         });
         navigate("/auth/login");
+      } else {
+        toast({
+          title: data?.payload?.message,
+          variant: "destructive",
+        });
       }
     });
   };
