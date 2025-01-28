@@ -69,11 +69,11 @@ const AdminSideBar = ({ open, setOpen }) => {
                 <ChartNoAxesCombined size={30} />
                 <span className="text-2xl font-extrabold">Admin Panel</span>
               </SheetTitle>
-              <SheetDescription></SheetDescription>
             </SheetHeader>
             <MenuItems setOpen={setOpen} />
           </div>
         </SheetContent>
+        <SheetDescription></SheetDescription>
       </Sheet>
       <aside className="hidden w-64 flex-col border-r bg-background p-6 lg:flex">
         <div
