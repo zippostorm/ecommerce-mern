@@ -1,19 +1,20 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { FileIcon, UploadCloudIcon, XIcon } from "lucide-react";
 import { Button } from "../ui/button";
+import axios from "axios";
 
 const ProductImageUpload = ({
   imageFile,
   setImageFile,
   uploadedImageUrl,
   setUploadedImageUrl,
+  setImageLoadingState,
 }) => {
   const inputRef = useRef(null);
 
   const handleImageFileChange = (event) => {
-    console.log(event.target.files);
     const selectedFile = event.target.files?.[0];
     if (selectedFile) setImageFile(selectedFile);
   };
@@ -32,6 +33,24 @@ const ProductImageUpload = ({
     setImageFile(null);
     if (inputRef.current) inputRef.current.value = "";
   };
+
+  const uploadImageToCloudinary = async () => {
+    setImageLoadingState(true);
+    const data = new FormData();
+    data.append("my_file", imageFile);
+    const response = await axios.post(
+      "http://localhost:5000/api/admin/products/upload-image",
+      data
+    );
+    if (response?.data.success) {
+      setUploadedImageUrl(response.data.result.url);
+      setImageLoadingState(false);
+    }
+  };
+
+  useEffect(() => {
+    if (imageFile !== null) uploadImageToCloudinary();
+  }, [imageFile]);
 
   return (
     <div className="w-full max-w-md mx-auto mt-4">
@@ -73,11 +92,6 @@ const ProductImageUpload = ({
                 <span className="sr-only">Remove File</span>
               </Button>
             </div>
-            <img
-              src={URL.createObjectURL(imageFile)}
-              alt="Uploaded"
-              className="mt-4"
-            />
           </div>
         )}
       </div>
