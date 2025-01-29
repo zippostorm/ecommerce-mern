@@ -63,7 +63,7 @@ export const loginUser = async (req, res) => {
         email: checkUser.email,
       },
       "CLIENT_SECRET_KEY",
-      { expiresIn: "60m" }
+      { expiresIn: "14d" }
     );
     res
       .cookie("token", token, {
