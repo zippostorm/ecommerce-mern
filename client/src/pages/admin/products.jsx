@@ -15,6 +15,7 @@ import { addNewProduct, fetchAllProducts } from "@/store/admin/products";
 import axios from "axios";
 import React, { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { MoonLoader } from "react-spinners";
 
 const initialFormData = {
   image: null,
@@ -32,8 +33,8 @@ const AdminProducts = () => {
     useState(false);
   const [formData, setFormData] = useState(initialFormData);
   const [imageFile, setImageFile] = useState(null);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
-  const [imageLoadingState, setImageLoadingState] = useState(false);
+
+  const [loading, setLoading] = useState(false);
 
   const { productList } = useSelector((state) => state.adminProducts);
 
@@ -42,6 +43,7 @@ const AdminProducts = () => {
 
   const onSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
     const data = new FormData();
     data.append("my_file", imageFile);
     const response = await axios.post(
@@ -56,6 +58,7 @@ const AdminProducts = () => {
           dispatch(fetchAllProducts());
           setOpenCreateProductsDialog(false);
           setImageFile(null);
+          setLoading(false);
           setFormData(initialFormData);
           toast({
             title: "Product added successfully",
@@ -88,22 +91,30 @@ const AdminProducts = () => {
         onOpenChange={() => setOpenCreateProductsDialog(false)}
       >
         <SheetContent side="right" className="overflow-auto">
-          <SheetHeader>
-            <SheetTitle>Add New Product</SheetTitle>
-          </SheetHeader>
-          <ProductImageUpload
-            imageFile={imageFile}
-            setImageFile={setImageFile}
-          />
-          <div className="py-6">
-            <CommonForm
-              onSubmit={onSubmit}
-              formData={formData}
-              setFormData={setFormData}
-              buttonText="Add"
-              formControls={addProductFormElements}
-            />
-          </div>
+          {loading ? (
+            <div className="min-h-screen flex items-center justify-center">
+              <MoonLoader size={80} />
+            </div>
+          ) : (
+            <>
+              <SheetHeader>
+                <SheetTitle>Add New Product</SheetTitle>
+              </SheetHeader>
+              <ProductImageUpload
+                imageFile={imageFile}
+                setImageFile={setImageFile}
+              />
+              <div className="py-6">
+                <CommonForm
+                  onSubmit={onSubmit}
+                  formData={formData}
+                  setFormData={setFormData}
+                  buttonText="Add"
+                  formControls={addProductFormElements}
+                />
+              </div>
+            </>
+          )}
         </SheetContent>
         <SheetDescription></SheetDescription>
       </Sheet>
