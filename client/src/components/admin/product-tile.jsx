@@ -18,7 +18,7 @@ const AdminProductTile = ({ product }) => {
             <span
               className={`${
                 product?.salePrice > 0 ? "line-through" : ""
-              }text-lg font-semibold text-primary`}
+              } text-lg font-semibold text-primary`}
             >
               {product?.price}
             </span>
