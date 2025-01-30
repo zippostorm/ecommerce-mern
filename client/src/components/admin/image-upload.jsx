@@ -34,6 +34,7 @@ const ProductImageUpload = ({
   const handleRemoveImage = () => {
     setImageFile(null);
     if (inputRef.current) inputRef.current.value = "";
+    setUploadedImageUrl("");
   };
 
   const uploadImageToCloudinary = async () => {

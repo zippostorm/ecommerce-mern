@@ -63,8 +63,6 @@ const AdminProducts = () => {
     dispatch(fetchAllProducts());
   }, [dispatch]);
 
-  console.log(productList, uploadedImageUrl, "productList");
-
   return (
     <Fragment>
       <div className="mb-5 w-full flex justify-end">
