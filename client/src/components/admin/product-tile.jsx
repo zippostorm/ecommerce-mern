@@ -1,5 +1,6 @@
 import React from "react";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent, CardFooter } from "../ui/card";
+import { Button } from "../ui/button";
 
 const AdminProductTile = ({ product }) => {
   return (
@@ -9,22 +10,34 @@ const AdminProductTile = ({ product }) => {
           <img
             src={product?.image}
             alt={product?.title}
-            className="w-full h-[300px] object-cover rounded-t-lg"
+            className="w-full h-[400px] object-cover rounded-t-lg"
           />
         </div>
         <CardContent>
-          <h2 className="text-xl font-bold mb-2">{product?.title}</h2>
-          <div className="flex justify-between items-center mb-2">
+          <h2 className="text-xl font-bold mb-2 mt-3">{product?.title}</h2>
+          <div className="flex items-center">
             <span
               className={`${
-                product?.salePrice > 0 ? "line-through" : ""
-              } text-lg font-semibold text-primary`}
+                product?.salePrice > 0
+                  ? "line-through font-semibold"
+                  : "ml-auto font-bold"
+              } text-lg text-primary`}
             >
-              {product?.price}
+              ${product?.price}
             </span>
-            <span className="text-lg font-bold">{product?.salePrice}</span>
+            <span
+              className={`${
+                product?.salePrice > 0 ? "text-lg font-bold ml-auto" : "hidden"
+              }`}
+            >
+              ${product?.salePrice}
+            </span>
           </div>
         </CardContent>
+        <CardFooter className="flex- justify-between items-center">
+          <Button>Edit</Button>
+          <Button>Delete</Button>
+        </CardFooter>
       </div>
     </Card>
   );
