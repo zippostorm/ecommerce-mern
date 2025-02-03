@@ -1,5 +1,6 @@
 import { imageUploadUtil } from "../../utils/cloudinary.js";
 import Product from "../../models/Product.js";
+import { v2 as cloudinary } from "cloudinary";
 
 export const handleImageUpload = async (req, res) => {
   try {
@@ -122,11 +123,21 @@ export const editProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findByIdAndDelete(id);
-    if (!product)
+
+    const product = await Product.findById(id);
+    if (!product) {
       return res
         .status(404)
         .json({ success: false, message: "Product not found" });
+    }
+
+    if (product.image) {
+      const publicId = product.image.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(`productsMERN/${publicId}`);
+    }
+
+    await Product.findByIdAndDelete(id);
+
     res.status(200).json({
       success: true,
       message: "Product deleted successfully",
