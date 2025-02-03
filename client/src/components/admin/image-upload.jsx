@@ -1,11 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { FileIcon, UploadCloudIcon, XIcon } from "lucide-react";
 import { Button } from "../ui/button";
-import axios from "axios";
 
-const ProductImageUpload = ({ imageFile, setImageFile }) => {
+const ProductImageUpload = ({ imageFile, setImageFile, isEditMode }) => {
   const inputRef = useRef(null);
 
   const handleImageFileChange = (event) => {
@@ -26,19 +25,6 @@ const ProductImageUpload = ({ imageFile, setImageFile }) => {
   const handleRemoveImage = () => {
     setImageFile(null);
     if (inputRef.current) inputRef.current.value = "";
-    setUploadedImageUrl("");
-  };
-
-  const uploadImageToCloudinary = async () => {
-    const data = new FormData();
-    data.append("my_file", imageFile);
-    const response = await axios.post(
-      "http://localhost:5000/api/admin/products/upload-image",
-      data
-    );
-    if (response?.data.success) {
-      setUploadedImageUrl(response.data.result.url);
-    }
   };
 
   return (
@@ -47,7 +33,9 @@ const ProductImageUpload = ({ imageFile, setImageFile }) => {
       <div
         onDragOver={handleDragOver}
         onDrop={handleDrop}
-        className="border-2 border-dashed rounded-lg p-4"
+        className={`${
+          isEditMode ? "opacity-60" : ""
+        } border-2 border-dashed rounded-lg p-4`}
       >
         <Input
           id="image-upload"
@@ -55,11 +43,14 @@ const ProductImageUpload = ({ imageFile, setImageFile }) => {
           className="hidden"
           ref={inputRef}
           onChange={handleImageFileChange}
+          disabled={isEditMode}
         />
         {!imageFile ? (
           <Label
             htmlFor="image-upload"
-            className="flex flex-col items-center justify-center h-32 cursor-pointer"
+            className={`${
+              isEditMode ? "cursor-not-allowed" : ""
+            } flex flex-col items-center justify-center h-32 cursor-pointer`}
           >
             <UploadCloudIcon className="w-10 h-10 text-muted-foreground mb-2" />
             <span>Drag & drop or click to upload image</span>
