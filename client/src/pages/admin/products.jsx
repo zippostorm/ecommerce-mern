@@ -146,12 +146,15 @@ const AdminProducts = () => {
           ) : (
             <>
               <SheetHeader>
-                <SheetTitle>Add New Product</SheetTitle>
+                <SheetTitle>
+                  {currentEditedId !== null ? "Edit" : "Add"} Product
+                </SheetTitle>
               </SheetHeader>
               <ProductImageUpload
                 imageFile={imageFile}
                 setImageFile={setImageFile}
                 isEditMode={currentEditedId !== null}
+                cloudinaryImage={formData.image}
               />
               <div className="py-6">
                 <CommonForm

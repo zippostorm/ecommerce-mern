@@ -4,7 +4,12 @@ import { Input } from "../ui/input";
 import { FileIcon, UploadCloudIcon, XIcon } from "lucide-react";
 import { Button } from "../ui/button";
 
-const ProductImageUpload = ({ imageFile, setImageFile, isEditMode }) => {
+const ProductImageUpload = ({
+  imageFile,
+  setImageFile,
+  isEditMode,
+  cloudinaryImage,
+}) => {
   const inputRef = useRef(null);
 
   const handleImageFileChange = (event) => {
@@ -29,52 +34,62 @@ const ProductImageUpload = ({ imageFile, setImageFile, isEditMode }) => {
 
   return (
     <div className="w-full max-w-md mx-auto mt-4">
-      <Label className="text-lg font-semibold mb-2 block">Upload Image</Label>
-      <div
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        className={`${
-          isEditMode ? "opacity-60" : ""
-        } border-2 border-dashed rounded-lg p-4`}
-      >
-        <Input
-          id="image-upload"
-          type="file"
-          className="hidden"
-          ref={inputRef}
-          onChange={handleImageFileChange}
-          disabled={isEditMode}
+      <Label className="text-lg font-semibold mb-2 block">
+        {isEditMode ? "" : "Product Image"}
+      </Label>
+      {isEditMode ? (
+        <img
+          src={cloudinaryImage}
+          alt={cloudinaryImage}
+          className="w-full h-[400px] object-cover rounded-t-lg"
         />
-        {!imageFile ? (
-          <Label
-            htmlFor="image-upload"
-            className={`${
-              isEditMode ? "cursor-not-allowed" : ""
-            } flex flex-col items-center justify-center h-32 cursor-pointer`}
-          >
-            <UploadCloudIcon className="w-10 h-10 text-muted-foreground mb-2" />
-            <span>Drag & drop or click to upload image</span>
-          </Label>
-        ) : (
-          <div className="flex flex-col">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <FileIcon className="w-8 h-8 text-primary mr-2" />
+      ) : (
+        <div
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          className={`${
+            isEditMode ? "opacity-30" : ""
+          } border-2 border-dashed rounded-lg p-4`}
+        >
+          <Input
+            id="image-upload"
+            type="file"
+            className="hidden"
+            ref={inputRef}
+            onChange={handleImageFileChange}
+            disabled={isEditMode}
+          />
+          {!imageFile ? (
+            <Label
+              htmlFor="image-upload"
+              className={`${
+                isEditMode ? "cursor-not-allowed" : ""
+              } flex flex-col items-center justify-center h-32 cursor-pointer`}
+            >
+              <UploadCloudIcon className="w-10 h-10 text-muted-foreground mb-2" />
+              <span>Drag & drop or click to upload image</span>
+            </Label>
+          ) : (
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <FileIcon className="w-8 h-8 text-primary mr-2" />
+                </div>
+                <p className="text-sm font-medium">{imageFile.name}</p>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={handleRemoveImage}
+                >
+                  <XIcon className="w-4 h-4" />
+                  <span className="sr-only">Remove File</span>
+                </Button>
               </div>
-              <p className="text-sm font-medium">{imageFile.name}</p>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground hover:text-foreground"
-                onClick={handleRemoveImage}
-              >
-                <XIcon className="w-4 h-4" />
-                <span className="sr-only">Remove File</span>
-              </Button>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
