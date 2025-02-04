@@ -13,6 +13,20 @@ import { fetchAllFilteredProducts } from "@/store/shop/products";
 import { ArrowUpDownIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
+
+const createSearchParamsHelper = (filterParams) => {
+  const queryParams = [];
+  for (const [key, value] of Object.entries(filterParams)) {
+    if (Array.isArray(value) && value.length > 0) {
+      const paramValue = value.join(",");
+
+      queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
+    }
+  }
+
+  return queryParams.join("&");
+};
 
 const ShoppingListing = () => {
   const dispatch = useDispatch();
@@ -21,6 +35,7 @@ const ShoppingListing = () => {
 
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const handleSort = (value) => {
     setSort(value);
@@ -53,8 +68,19 @@ const ShoppingListing = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(fetchAllFilteredProducts());
-  }, [dispatch]);
+    if (filters && Object.keys(filters).length > 0) {
+      const createQueryString = createSearchParamsHelper(filters);
+      setSearchParams(new URLSearchParams(createQueryString));
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    if (filters !== null && sort !== null) {
+    }
+    dispatch(
+      fetchAllFilteredProducts({ filterParams: filters, sortParams: sort })
+    );
+  }, [dispatch, sort, filters]);
 
   console.log(filters, "Filters");
 
