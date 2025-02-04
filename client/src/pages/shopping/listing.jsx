@@ -11,27 +11,63 @@ import {
 import { sortOptions } from "@/config";
 import { fetchAllFilteredProducts } from "@/store/shop/products";
 import { ArrowUpDownIcon } from "lucide-react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const ShoppingListing = () => {
   const dispatch = useDispatch();
+
   const { productList } = useSelector((state) => state.shopProducts);
+
+  const [filters, setFilters] = useState({});
+  const [sort, setSort] = useState(null);
+
+  const handleSort = (value) => {
+    setSort(value);
+  };
+
+  const handleFilter = (getSectionId, getCurrentOption) => {
+    let copyFilters = { ...filters };
+    const indexOfCurrentSection =
+      Object.keys(copyFilters).indexOf(getSectionId);
+
+    if (indexOfCurrentSection === -1) {
+      copyFilters = {
+        ...copyFilters,
+        [getSectionId]: [getCurrentOption],
+      };
+    } else {
+      const indexOfCurrentOption =
+        copyFilters[getSectionId].indexOf(getCurrentOption);
+      if (indexOfCurrentOption === -1)
+        copyFilters[getSectionId].push(getCurrentOption);
+      else copyFilters[getSectionId].splice(indexOfCurrentOption, 1);
+    }
+    setFilters(copyFilters);
+    sessionStorage.setItem("filters", JSON.stringify(copyFilters));
+  };
+
+  useEffect(() => {
+    setSort("price-lowtohigh");
+    setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
+  }, []);
 
   useEffect(() => {
     dispatch(fetchAllFilteredProducts());
   }, [dispatch]);
 
-  console.log(productList, "products");
+  console.log(filters, "Filters");
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6 p-4 md:p-6">
-      <ProductFilter />
+      <ProductFilter filters={filters} handleFilter={handleFilter} />
       <div className="bg-background w-full rounded-lg shadow-sm">
         <div className="p-4 border-b flex items-center justify-between">
           <h2 className="text-lg font-extrabold">All Products</h2>
           <div className="flex items-center gap-3">
-            <span className="text-muted-foreground">10 Products</span>
+            <span className="text-muted-foreground">
+              {productList?.length} Products
+            </span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -44,9 +80,12 @@ const ShoppingListing = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-[200px]">
-                <DropdownMenuRadioGroup>
+                <DropdownMenuRadioGroup value={sort} onValueChange={handleSort}>
                   {sortOptions.map((sortItem) => (
-                    <DropdownMenuRadioItem key={sortItem.id}>
+                    <DropdownMenuRadioItem
+                      value={sortItem.id}
+                      key={sortItem.id}
+                    >
                       {sortItem.label}
                     </DropdownMenuRadioItem>
                   ))}
@@ -59,7 +98,10 @@ const ShoppingListing = () => {
           {productList &&
             productList.length > 0 &&
             productList.map((productItem) => (
-              <ShoppingProductTile product={productItem} />
+              <ShoppingProductTile
+                key={productItem._id}
+                product={productItem}
+              />
             ))}
         </div>
       </div>
