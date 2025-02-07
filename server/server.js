@@ -5,6 +5,7 @@ import cors from "cors";
 import authRouter from "./routes/auth/auth.route.js";
 import adminProductsRouter from "./routes/admin/products.route.js";
 import shopProductsRouter from "./routes/shop/products.route.js";
+import shopCartRouter from "./routes/shop/cart.route.js";
 
 mongoose
   .connect(
@@ -36,5 +37,6 @@ app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/shop/products", shopProductsRouter);
+app.use("/api/shop/cart", shopCartRouter);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
