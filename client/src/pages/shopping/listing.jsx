@@ -10,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { sortOptions } from "@/config";
+import { useToast } from "@/hooks/use-toast";
+import { addToCart, fetchCartItems } from "@/store/shop/cart";
 import {
   fetchAllFilteredProducts,
   fetchProductDetails,
@@ -38,11 +40,14 @@ const ShoppingListing = () => {
   const { productList, productDetails } = useSelector(
     (state) => state.shopProducts
   );
+  const { user } = useSelector((state) => state.auth);
 
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+
+  const { toast } = useToast();
 
   const handleSort = (value) => {
     setSort(value);
@@ -71,6 +76,23 @@ const ShoppingListing = () => {
 
   const HandleGetProductDetails = (getCurrentProductId) => {
     dispatch(fetchProductDetails(getCurrentProductId));
+  };
+
+  const handleAddToCart = (getCurrentProductId) => {
+    dispatch(
+      addToCart({
+        userId: user?.id,
+        productId: getCurrentProductId,
+        quantity: 1,
+      })
+    ).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(fetchCartItems(user?.id));
+        toast({
+          title: "Product added to cart successfully",
+        });
+      }
+    });
   };
 
   useEffect(() => {
@@ -141,6 +163,7 @@ const ShoppingListing = () => {
                 key={productItem._id}
                 HandleGetProductDetails={HandleGetProductDetails}
                 product={productItem}
+                handleAddToCart={handleAddToCart}
               />
             ))}
         </div>

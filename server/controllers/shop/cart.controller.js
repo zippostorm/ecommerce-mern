@@ -5,7 +5,7 @@ export const addToCart = async (req, res) => {
   try {
     const { userId, productId, quantity } = req.body;
 
-    if (!userId || !productId || !quantity <= 0) {
+    if (!userId || !productId || quantity <= 0) {
       return res.status(400).json({
         success: false,
         message: "Invalid data provided",
@@ -105,7 +105,7 @@ export const updateCartItemQuantity = async (req, res) => {
   try {
     const { userId, productId, quantity } = req.body;
 
-    if (!userId || !productId || !quantity <= 0) {
+    if (!userId || !productId || quantity <= 0) {
       return res.status(400).json({
         success: false,
         message: "Invalid data provided",
@@ -190,7 +190,7 @@ export const deleteCartItem = async (req, res) => {
 
     await cart.save();
 
-    await Cart.populate({
+    await cart.populate({
       path: "items.productId",
       select: "image title price salePrice",
     });
