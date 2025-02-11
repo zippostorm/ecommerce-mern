@@ -2,18 +2,44 @@ import { Minus, Plus, Trash } from "lucide-react";
 import React from "react";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteCartItem } from "@/store/shop/cart";
+import { deleteCartItem, updateCartQuantity } from "@/store/shop/cart";
+import { useToast } from "@/hooks/use-toast";
 
 const UserCartItemsContent = ({ cartItem }) => {
   const dispatch = useDispatch();
 
   const { user } = useSelector((state) => state.auth);
+  const { toast } = useToast();
 
   const handleCartItemDelete = (getCartItem) => {
-    console.log(cartItem);
     dispatch(
       deleteCartItem({ userId: user?.id, productId: getCartItem?.productId })
-    );
+    ).then((data) => {
+      if (data?.payload?.success) {
+        toast({
+          title: "Cart item is deleted successfully",
+        });
+      }
+    });
+  };
+
+  const handleUpdateQuantity = (getCartItem, typeOfAction) => {
+    dispatch(
+      updateCartQuantity({
+        userId: user?.id,
+        productId: getCartItem?.productId,
+        quantity:
+          typeOfAction === "plus"
+            ? getCartItem?.quantity + 1
+            : getCartItem?.quantity - 1,
+      })
+    ).then((data) => {
+      if (data?.payload?.success) {
+        toast({
+          title: "Cart item is updated successfully",
+        });
+      }
+    });
   };
   return (
     <div className="flex items-center space-x-4">
@@ -29,6 +55,8 @@ const UserCartItemsContent = ({ cartItem }) => {
             variant="outline"
             className="h-8 w-8 rounded-full"
             size="icon"
+            disabled={cartItem?.quantity === 1}
+            onClick={() => handleUpdateQuantity(cartItem, "minus")}
           >
             <Minus className="w-4 h-4" />
             <span className="sr-only">Decrease</span>
@@ -38,6 +66,7 @@ const UserCartItemsContent = ({ cartItem }) => {
             variant="outline"
             className="h-8 w-8 rounded-full"
             size="icon"
+            onClick={() => handleUpdateQuantity(cartItem, "plus")}
           >
             <Plus className="w-4 h-4" />
             <span className="sr-only">Decrease</span>
