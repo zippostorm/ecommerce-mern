@@ -23,14 +23,34 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import { logoutUser } from "@/store/auth";
 import UserCartWrapper from "./cart-wrapper";
 import { fetchCartItems } from "@/store/shop/cart";
+import { Label } from "../ui/label";
 
 const MenuItems = () => {
+  const navigate = useNavigate();
+
+  const handleNavigate = (getCurrentMenuItem) => {
+    sessionStorage.removeItem("filters");
+    const currentFilter =
+      getCurrentMenuItem.id !== "home"
+        ? {
+            category: [getCurrentMenuItem.id],
+          }
+        : null;
+
+    sessionStorage.setItem("filters", JSON.stringify(currentFilter));
+    navigate(getCurrentMenuItem.path);
+  };
+
   return (
     <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
       {shoppingViewHeaderMenuItems.map((menuItem) => (
-        <Link className="font-medium" key={menuItem.id} to={menuItem.path}>
+        <Label
+          onClick={() => handleNavigate(menuItem)}
+          className="font-medium text-lg cursor-pointer"
+          key={menuItem.id}
+        >
           {menuItem.label}
-        </Link>
+        </Label>
       ))}
     </nav>
   );

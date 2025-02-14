@@ -6,15 +6,15 @@ import { Button } from "@/components/ui/button";
 import {
   Airplay,
   BabyIcon,
+  BookHeart,
   ChevronLeftIcon,
   ChevronRightIcon,
-  CloudLightning,
+  Footprints,
   Heater,
   Images,
   Shirt,
   ShirtIcon,
   ShoppingBasket,
-  UmbrellaIcon,
   WashingMachine,
   WatchIcon,
 } from "lucide-react";
@@ -22,13 +22,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllFilteredProducts } from "@/store/shop/products";
 import ShoppingProductTile from "@/components/shopping/product-tile";
+import { useNavigate } from "react-router-dom";
 
 const categoriesWithIcon = [
   { id: "men", label: "Men", icon: ShirtIcon },
-  { id: "women", label: "Women", icon: CloudLightning },
+  { id: "women", label: "Women", icon: BookHeart },
   { id: "kids", label: "Kids", icon: BabyIcon },
   { id: "accessories", label: "Accessories", icon: WatchIcon },
-  { id: "footwear", label: "Footwear", icon: UmbrellaIcon },
+  { id: "footwear", label: "Footwear", icon: Footprints },
 ];
 
 const brandsWithIcon = [
@@ -44,8 +45,20 @@ const ShoppingHome = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const { productList } = useSelector((state) => state.shopProducts);
+
   const dispatch = useDispatch();
   const slides = [bannerOne, bannerTwo, bannerThree];
+  const navigate = useNavigate();
+
+  const handleNavigateToListingPage = (getCurrentItem, section) => {
+    sessionStorage.removeItem("filters");
+    const currentFilter = {
+      [section]: [getCurrentItem.id],
+    };
+
+    sessionStorage.setItem("filters", JSON.stringify(currentFilter));
+    navigate(`/shop/listing`);
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -107,6 +120,9 @@ const ShoppingHome = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {categoriesWithIcon.map((categoryItem) => (
               <Card
+                onClick={() =>
+                  handleNavigateToListingPage(categoryItem, "category")
+                }
                 key={categoryItem.id}
                 className="cursor-pointer hover:shadow-lg transition-shadow"
               >
@@ -125,6 +141,7 @@ const ShoppingHome = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {brandsWithIcon.map((brandItem) => (
               <Card
+                onClick={() => handleNavigateToListingPage(brandItem, "brand")}
                 key={brandItem.id}
                 className="cursor-pointer hover:shadow-lg transition-shadow"
               >
@@ -145,7 +162,10 @@ const ShoppingHome = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {productList && productList.length > 0
               ? productList.map((productItem) => (
-                  <ShoppingProductTile product={productItem} />
+                  <ShoppingProductTile
+                    product={productItem}
+                    key={productItem._id}
+                  />
                 ))
               : null}
           </div>
