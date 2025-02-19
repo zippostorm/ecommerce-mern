@@ -3,7 +3,11 @@ import { Card, CardContent, CardFooter } from "../ui/card";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 
-const AddressCard = ({ addressInfo, handleDeleteAddress }) => {
+const AddressCard = ({
+  addressInfo,
+  handleDeleteAddress,
+  handleEditAddress,
+}) => {
   return (
     <Card>
       <CardContent className="grid gap-4 p-4">
@@ -14,7 +18,7 @@ const AddressCard = ({ addressInfo, handleDeleteAddress }) => {
         <Label>Notes: {addressInfo?.notes}</Label>
       </CardContent>
       <CardFooter className="p-3 flex justify-between">
-        <Button>Edit</Button>
+        <Button onClick={() => handleEditAddress(addressInfo)}>Edit</Button>
         <Button onClick={() => handleDeleteAddress(addressInfo)}>Delete</Button>
       </CardFooter>
     </Card>

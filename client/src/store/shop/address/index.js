@@ -31,7 +31,7 @@ export const fetchAllAddresses = createAsyncThunk(
 
 export const editAddress = createAsyncThunk(
   "/addresses/editAddress",
-  async (userId, addresId, formData) => {
+  async ({ userId, addresId, formData }) => {
     const response = await axios.put(
       `http://localhost:5000/api/shop/address/update/${userId}/${addresId}`,
       formData
