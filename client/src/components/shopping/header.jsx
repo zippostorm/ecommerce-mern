@@ -38,7 +38,8 @@ const MenuItems = () => {
         : null;
 
     sessionStorage.setItem("filters", JSON.stringify(currentFilter));
-    navigate(getCurrentMenuItem.path);
+    navigate(getCurrentMenuItem.path, { replace: true });
+    window.location.reload();
   };
 
   return (

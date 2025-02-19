@@ -20,9 +20,15 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllFilteredProducts } from "@/store/shop/products";
+import {
+  fetchAllFilteredProducts,
+  fetchProductDetails,
+} from "@/store/shop/products";
 import ShoppingProductTile from "@/components/shopping/product-tile";
 import { useNavigate } from "react-router-dom";
+import { addToCart, fetchCartItems } from "@/store/shop/cart";
+import { useToast } from "@/hooks/use-toast";
+import ProductDetailsDialog from "@/components/shopping/product-details";
 
 const categoriesWithIcon = [
   { id: "men", label: "Men", icon: ShirtIcon },
@@ -43,9 +49,14 @@ const brandsWithIcon = [
 
 const ShoppingHome = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
-  const { productList } = useSelector((state) => state.shopProducts);
+  const { productList, productDetails } = useSelector(
+    (state) => state.shopProducts
+  );
+  const { user } = useSelector((state) => state.auth);
 
+  const { toast } = useToast();
   const dispatch = useDispatch();
   const slides = [bannerOne, bannerTwo, bannerThree];
   const navigate = useNavigate();
@@ -58,6 +69,27 @@ const ShoppingHome = () => {
 
     sessionStorage.setItem("filters", JSON.stringify(currentFilter));
     navigate(`/shop/listing`);
+  };
+
+  const HandleGetProductDetails = (getCurrentProductId) => {
+    dispatch(fetchProductDetails(getCurrentProductId));
+  };
+
+  const handleAddToCart = (getCurrentProductId) => {
+    dispatch(
+      addToCart({
+        userId: user?.id,
+        productId: getCurrentProductId,
+        quantity: 1,
+      })
+    ).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(fetchCartItems(user?.id));
+        toast({
+          title: "Product added to cart successfully",
+        });
+      }
+    });
   };
 
   useEffect(() => {
@@ -76,6 +108,10 @@ const ShoppingHome = () => {
       })
     );
   }, [dispatch]);
+
+  useEffect(() => {
+    if (productDetails !== null) setOpenDetailsDialog(true);
+  }, [productDetails]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -165,12 +201,19 @@ const ShoppingHome = () => {
                   <ShoppingProductTile
                     product={productItem}
                     key={productItem._id}
+                    HandleGetProductDetails={HandleGetProductDetails}
+                    handleAddToCart={handleAddToCart}
                   />
                 ))
               : null}
           </div>
         </div>
       </section>
+      <ProductDetailsDialog
+        open={openDetailsDialog}
+        setOpen={setOpenDetailsDialog}
+        productDetails={productDetails}
+      />
     </div>
   );
 };
