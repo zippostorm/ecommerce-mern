@@ -1,5 +1,6 @@
 import paypal from "../../utils/paypal.js";
 import Order from "../../models/Order.js";
+import Cart from "../../models/Cart.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -15,6 +16,7 @@ export const createOrder = async (req, res) => {
       orderUpdateDate,
       paymentId,
       payerId,
+      cartId,
     } = req.body;
 
     const create_payment_json = {
@@ -56,6 +58,7 @@ export const createOrder = async (req, res) => {
       } else {
         const newlyCreatedOrder = new Order({
           userId,
+          cartId,
           cartItems,
           addressInfo,
           orderStatus,
@@ -92,6 +95,32 @@ export const createOrder = async (req, res) => {
 
 export const capturePayment = async (req, res) => {
   try {
+    const { paymentId, payerId, orderId } = req.body;
+
+    let order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    order.paymentStatus = "paid";
+    order.orderStatus = "confirmed";
+    order.paymentId = paymentId;
+    order.payerId = payerId;
+
+    const getCartId = order.cartId;
+    await Cart.findByIdAndDelete(getCartId);
+
+    await order.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Payment captured successfully",
+      data: order,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
