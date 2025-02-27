@@ -5,18 +5,19 @@ import { useDispatch, useSelector } from "react-redux";
 import UserCartItemsContent from "@/components/shopping/cart-items-content";
 import { Button } from "@/components/ui/button";
 import { createNewOrder } from "@/store/shop/order";
+import { useToast } from "@/hooks/use-toast";
 
 const ShoppingCheckout = () => {
   const { cartItems } = useSelector((state) => state.shopCart);
   const { user } = useSelector((state) => state.auth);
   const { approvalURL } = useSelector((state) => state.shopOrder);
 
+  const { toast } = useToast();
+
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
   const [isPaymentStart, setIsPaymentStart] = useState(false);
 
   const dispatch = useDispatch();
-
-  console.log(currentSelectedAddress, "current address");
 
   const totalCartAmmount =
     cartItems && cartItems.items && cartItems.items.length > 0
@@ -32,6 +33,24 @@ const ShoppingCheckout = () => {
       : 0;
 
   const handleInitiatePaypalPayment = () => {
+    if (cartItems.length === 0) {
+      toast({
+        title: "Cart is empty",
+        variant: "destructive",
+      });
+
+      return;
+    }
+
+    if (currentSelectedAddress === null) {
+      toast({
+        title: "Please select an address",
+        variant: "destructive",
+      });
+
+      return;
+    }
+
     const orderData = {
       userId: user?.id,
       cartId: cartItems?._id,
@@ -63,10 +82,7 @@ const ShoppingCheckout = () => {
       payerId: "",
     };
 
-    console.log(orderData);
-
     dispatch(createNewOrder(orderData)).then((data) => {
-      console.log(data, "nikita");
       if (data?.payload?.success) {
         setIsPaymentStart(true);
       } else {
