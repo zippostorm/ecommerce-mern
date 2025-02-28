@@ -12,24 +12,17 @@ import {
   TableRow,
   TableCell,
 } from "../ui/table";
-import { useDispatch } from "react-redux";
 
 const initialFormData = {
   status: "",
 };
 
-const AdminOrderDetailsView = ({ orderDetails }) => {
+const AdminOrderDetailsView = ({ orderDetails, username }) => {
   const [formData, setFormData] = useState(initialFormData);
-
-  const dispatch = useDispatch();
 
   const handleUpdateStatus = (event) => {
     event.preventDefault();
   };
-
-  console.log(orderDetails);
-
-  useEffect(() => {}, [dispatch]);
 
   return (
     <DialogContent className="sm:max-w-[600px]">
@@ -119,7 +112,7 @@ const AdminOrderDetailsView = ({ orderDetails }) => {
             <div className="font-medium">Shipping Info</div>
             <div className="flex mt-4 items-center justify-between">
               <p className="font-medium">Username</p>
-              <Label>Username</Label>
+              <Label>{username}</Label>
             </div>
             <div className="flex mt-2 items-center justify-between">
               <p className="font-medium">City</p>

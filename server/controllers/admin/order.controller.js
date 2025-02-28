@@ -1,4 +1,5 @@
 import Order from "../../models/Order.js";
+import User from "../../models/User.js";
 
 export const getAllOrdersOfAllUsers = async (req, res) => {
   try {
@@ -40,6 +41,32 @@ export const getOrderDetailsForAdmin = async (req, res) => {
     res.status(200).json({
       success: true,
       data: order,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Some error occured",
+    });
+  }
+};
+
+export const getDetailsUsernameForAdmin = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: user,
     });
   } catch (error) {
     console.log(error);

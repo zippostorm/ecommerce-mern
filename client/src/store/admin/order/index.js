@@ -5,6 +5,7 @@ const initialState = {
   isLoading: false,
   orderList: [],
   orderDetails: null,
+  userDetails: null,
 };
 
 export const getAllOrdersForAdmin = createAsyncThunk(
@@ -29,12 +30,26 @@ export const getOrderDetailsForAdmin = createAsyncThunk(
   }
 );
 
+export const getDetailsUsernameForAdmin = createAsyncThunk(
+  "/order/getDetailsUsernameForAdmin",
+  async (userId) => {
+    const response = await axios.get(
+      `http://localhost:5000/api/admin/orders/user/${userId}`
+    );
+
+    return response.data;
+  }
+);
+
 const adminOrderSlice = createSlice({
   name: "adminOrderSlice",
   initialState,
   reducers: {
     resetOrderDetailsForAdmin: (state) => {
       state.orderDetails = null;
+    },
+    resetDetailsUsernameForAdmin: (state) => {
+      state.userDetails = null;
     },
   },
   extraReducers: (builder) => {
@@ -60,9 +75,16 @@ const adminOrderSlice = createSlice({
       .addCase(getOrderDetailsForAdmin.rejected, (state) => {
         state.isLoading = false;
         state.orderDetails = null;
+      })
+      .addCase(getDetailsUsernameForAdmin.fulfilled, (state, action) => {
+        state.userDetails = action.payload.data;
+      })
+      .addCase(getDetailsUsernameForAdmin.rejected, (state) => {
+        state.userDetails = null;
       });
   },
 });
 
-export const { resetOrderDetailsForAdmin } = adminOrderSlice.actions;
+export const { resetOrderDetailsForAdmin, resetDetailsUsernameForAdmin } =
+  adminOrderSlice.actions;
 export default adminOrderSlice.reducer;

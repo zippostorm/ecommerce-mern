@@ -14,7 +14,9 @@ import AdminOrdersDetailsView from "./order-details";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllOrdersForAdmin,
+  getDetailsUsernameForAdmin,
   getOrderDetailsForAdmin,
+  resetDetailsUsernameForAdmin,
   resetOrderDetailsForAdmin,
 } from "@/store/admin/order";
 import { Badge } from "../ui/badge";
@@ -22,12 +24,15 @@ import { Badge } from "../ui/badge";
 const AdminOrdersView = () => {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
-  const { orderList, orderDetails } = useSelector((state) => state.adminOrder);
+  const { orderList, orderDetails, userDetails } = useSelector(
+    (state) => state.adminOrder
+  );
 
   const dispatch = useDispatch();
 
-  const handleFetchOrderDetails = (getId) => {
+  const handleFetchOrderDetails = (getId, getUserId) => {
     dispatch(getOrderDetailsForAdmin(getId));
+    dispatch(getDetailsUsernameForAdmin(getUserId));
   };
 
   useEffect(() => {
@@ -76,7 +81,12 @@ const AdminOrdersView = () => {
                     <TableCell>${orderItem?.totalAmount}</TableCell>
                     <TableCell>
                       <Button
-                        onClick={() => handleFetchOrderDetails(orderItem?._id)}
+                        onClick={() => {
+                          handleFetchOrderDetails(
+                            orderItem?._id,
+                            orderItem?.userId
+                          );
+                        }}
                       >
                         View Details
                       </Button>
@@ -92,9 +102,13 @@ const AdminOrdersView = () => {
         onOpenChange={() => {
           setOpenDetailsDialog(false);
           dispatch(resetOrderDetailsForAdmin());
+          dispatch(resetDetailsUsernameForAdmin());
         }}
       >
-        <AdminOrdersDetailsView orderDetails={orderDetails} />
+        <AdminOrdersDetailsView
+          orderDetails={orderDetails}
+          username={userDetails?.userName}
+        />
       </Dialog>
     </Card>
   );
