@@ -12,20 +12,32 @@ import { Button } from "../ui/button";
 import { Dialog } from "../ui/dialog";
 import ShoppingOrderDetailsView from "./order-details";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllOrdersByUserId } from "@/store/shop/order";
+import {
+  getAllOrdersByUserId,
+  getOrderDetails,
+  resetOrderDetails,
+} from "@/store/shop/order";
 import { Badge } from "../ui/badge";
 
 const ShoppingOrders = () => {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
   const { user } = useSelector((state) => state.auth);
-  const { orderList } = useSelector((state) => state.shopOrder);
+  const { orderList, orderDetails } = useSelector((state) => state.shopOrder);
 
   const dispatch = useDispatch();
+
+  const handleFetchOrderDetails = (getId) => {
+    dispatch(getOrderDetails(getId));
+  };
 
   useEffect(() => {
     dispatch(getAllOrdersByUserId(user?.id));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (orderDetails !== null) setOpenDetailsDialog(true);
+  }, [orderDetails]);
 
   return (
     <Card>
@@ -64,15 +76,11 @@ const ShoppingOrders = () => {
                     </TableCell>
                     <TableCell>${orderItem?.totalAmount}</TableCell>
                     <TableCell>
-                      <Dialog
-                        open={openDetailsDialog}
-                        onOpenChange={setOpenDetailsDialog}
+                      <Button
+                        onClick={() => handleFetchOrderDetails(orderItem?._id)}
                       >
-                        <Button onClick={() => setOpenDetailsDialog(true)}>
-                          View Details
-                        </Button>
-                        <ShoppingOrderDetailsView />
-                      </Dialog>
+                        View Details
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))
@@ -80,6 +88,15 @@ const ShoppingOrders = () => {
           </TableBody>
         </Table>
       </CardContent>
+      <Dialog
+        open={openDetailsDialog}
+        onOpenChange={() => {
+          setOpenDetailsDialog(false);
+          dispatch(resetOrderDetails());
+        }}
+      >
+        <ShoppingOrderDetailsView orderDetails={orderDetails} />
+      </Dialog>
     </Card>
   );
 };

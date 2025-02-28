@@ -1,28 +1,42 @@
 import React from "react";
-import { DialogContent } from "../ui/dialog";
+import { DialogContent, DialogDescription, DialogTitle } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
+import { Badge } from "../ui/badge";
 
-const ShoppingOrderDetailsView = () => {
+const ShoppingOrderDetailsView = ({ orderDetails }) => {
   return (
     <DialogContent className="sm:max-w-[600px] ">
+      <DialogTitle>Order Details</DialogTitle>
       <div className="grid gap-6">
         <div className="grid gap-2">
           <div className="flex mt-10 items-center justify-between">
             <p className="font-medium">Order ID</p>
-            <Label>123456</Label>
+            <Label>{orderDetails?._id}</Label>
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Order Date</p>
-            <Label>22/02/2025</Label>
+            <Label>
+              {new Date(orderDetails?.orderDate).toLocaleDateString("ru-RU")}
+            </Label>
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Order Price</p>
-            <Label>$500</Label>
+            <Label>${orderDetails?.totalAmount}</Label>
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Order Status</p>
-            <Label>In process</Label>
+            <Label>
+              <Badge
+                className={`py-1 px-3 ${
+                  orderDetails?.orderStatus === "confirmed"
+                    ? "bg-green-500"
+                    : "bg-black"
+                }`}
+              >
+                {orderDetails?.orderStatus}
+              </Badge>
+            </Label>
           </div>
         </div>
         <Separator />
@@ -30,10 +44,18 @@ const ShoppingOrderDetailsView = () => {
           <div className="grid gap-2">
             <div className="font-medium">Order Details</div>
             <ul className="grid gap-3">
-              <li className="flex items-center justify-between">
-                <span>Product One</span>
-                <span>$500</span>
-              </li>
+              {orderDetails?.cartItems && orderDetails?.cartItems.length > 0
+                ? orderDetails.cartItems.map((item) => (
+                    <li
+                      key={item?.productId}
+                      className="flex items-center justify-between"
+                    >
+                      <span>Title: {item?.title}</span>
+                      <span>Quantity: {item?.quantity}</span>
+                      <span>Price: ${item?.price}</span>
+                    </li>
+                  ))
+                : null}
             </ul>
           </div>
         </div>
@@ -51,6 +73,9 @@ const ShoppingOrderDetailsView = () => {
           </div>
         </div>
       </div>
+      <DialogDescription className="sr-only">
+        Order Details Dialog
+      </DialogDescription>
     </DialogContent>
   );
 };
