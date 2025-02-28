@@ -1,63 +1,145 @@
-import React, { useState } from "react";
-import { DialogContent } from "../ui/dialog";
+import React, { useEffect, useState } from "react";
+import { DialogContent, DialogTitle } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
 import CommonForm from "../common/form";
+import { Badge } from "../ui/badge";
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableCell,
+} from "../ui/table";
+import { useDispatch } from "react-redux";
 
 const initialFormData = {
   status: "",
 };
 
-const AdminOrderDetailsView = () => {
+const AdminOrderDetailsView = ({ orderDetails }) => {
   const [formData, setFormData] = useState(initialFormData);
+
+  const dispatch = useDispatch();
 
   const handleUpdateStatus = (event) => {
     event.preventDefault();
   };
 
+  console.log(orderDetails);
+
+  useEffect(() => {}, [dispatch]);
+
   return (
-    <DialogContent className="sm:max-w-[600px] ">
+    <DialogContent className="sm:max-w-[600px]">
+      <DialogTitle>Order Admin Details</DialogTitle>
       <div className="grid gap-6">
         <div className="grid gap-2">
           <div className="flex mt-10 items-center justify-between">
             <p className="font-medium">Order ID</p>
-            <Label>123456</Label>
+            <Label>{orderDetails?._id}</Label>
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Order Date</p>
-            <Label>22/02/2025</Label>
+            <Label>
+              {new Date(orderDetails?.orderDate).toLocaleDateString("ru-RU")}
+            </Label>
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Order Price</p>
-            <Label>$500</Label>
+            <Label>${orderDetails?.totalAmount}</Label>
+          </div>
+          <div className="flex mt-2 items-center justify-between">
+            <p className="font-medium">Payment Method</p>
+            <Label>{orderDetails?.paymentMethod}</Label>
+          </div>
+          <div className="flex mt-2 items-center justify-between">
+            <p className="font-medium">Payment Status</p>
+            <Label>
+              <Badge
+                className={`py-1 px-3 ${
+                  orderDetails?.paymentStatus === "paid"
+                    ? "bg-green-500"
+                    : "bg-black"
+                }`}
+              >
+                {orderDetails?.paymentStatus}
+              </Badge>
+            </Label>
           </div>
           <div className="flex mt-2 items-center justify-between">
             <p className="font-medium">Order Status</p>
-            <Label>In process</Label>
+            <Label>
+              <Badge
+                className={`py-1 px-3 ${
+                  orderDetails?.orderStatus === "confirmed"
+                    ? "bg-green-500"
+                    : "bg-black"
+                }`}
+              >
+                {orderDetails?.orderStatus}
+              </Badge>
+            </Label>
           </div>
         </div>
         <Separator />
         <div className="grid gap-4">
           <div className="grid gap-2">
             <div className="font-medium">Order Details</div>
-            <ul className="grid gap-3">
-              <li className="flex items-center justify-between">
-                <span>Product One</span>
-                <span>$500</span>
-              </li>
-            </ul>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Title</TableHead>
+                  <TableHead className="text-center">Quantity</TableHead>
+                  <TableHead className="text-center">Price</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {orderDetails?.cartItems && orderDetails?.cartItems.length > 0
+                  ? orderDetails.cartItems.map((item) => (
+                      <TableRow key={item?._id}>
+                        <TableCell>{item?.title}</TableCell>
+                        <TableCell className="text-center">
+                          {item?.quantity}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          ${item?.price}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  : null}
+              </TableBody>
+            </Table>
           </div>
         </div>
+        <Separator />
         <div className="grid gap-4">
           <div className="grid gap-2">
             <div className="font-medium">Shipping Info</div>
-            <div className="grid gap-0.5 text-muted-foreground">
-              <span>John Doe</span>
-              <span>Address</span>
-              <span>City</span>
-              <span>Pincode</span>
-              <span>Phone</span>
-              <span>Notes</span>
+            <div className="flex mt-4 items-center justify-between">
+              <p className="font-medium">Username</p>
+              <Label>Username</Label>
+            </div>
+            <div className="flex mt-2 items-center justify-between">
+              <p className="font-medium">City</p>
+              <Label>{orderDetails?.addressInfo?.city}</Label>
+            </div>
+            <div className="flex mt-2 items-center justify-between">
+              <p className="font-medium">Address</p>
+              <Label>{orderDetails?.addressInfo?.address}</Label>
+            </div>
+            <div className="flex mt-2 items-center justify-between">
+              <p className="font-medium">Pincode</p>
+              <Label>{orderDetails?.addressInfo?.pincode}</Label>
+            </div>
+            <div className="flex mt-2 items-center justify-between">
+              <p className="font-medium">Phone</p>
+              <Label>{orderDetails?.addressInfo?.phone}</Label>
+            </div>
+            <div className="flex mt-2 items-center justify-between">
+              <p className="font-medium">Notes</p>
+              <Label>{orderDetails?.addressInfo?.notes}</Label>
             </div>
           </div>
         </div>
