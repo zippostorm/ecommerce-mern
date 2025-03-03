@@ -72,6 +72,14 @@ const AdminOrdersView = () => {
                         className={`py-1 px-3 ${
                           orderItem?.orderStatus === "confirmed"
                             ? "bg-green-500"
+                            : orderItem?.orderStatus === "rejected"
+                            ? "bg-red-500"
+                            : orderItem?.orderStatus === "inProcess"
+                            ? "bg-yellow-500"
+                            : orderItem?.orderStatus === "inShipping"
+                            ? "bg-blue-500"
+                            : orderItem?.orderStatus === "delivered"
+                            ? "bg-green-500"
                             : "bg-black"
                         }`}
                       >

@@ -12,6 +12,12 @@ import {
   TableRow,
   TableCell,
 } from "../ui/table";
+import { useDispatch } from "react-redux";
+import {
+  getAllOrdersForAdmin,
+  getOrderDetailsForAdmin,
+  updateOrderStatus,
+} from "@/store/admin/order";
 
 const initialFormData = {
   status: "",
@@ -20,12 +26,25 @@ const initialFormData = {
 const AdminOrderDetailsView = ({ orderDetails, username }) => {
   const [formData, setFormData] = useState(initialFormData);
 
+  const dispatch = useDispatch();
+
   const handleUpdateStatus = (event) => {
     event.preventDefault();
+    const { status } = formData;
+
+    dispatch(
+      updateOrderStatus({ id: orderDetails?._id, orderStatus: status })
+    ).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(getOrderDetailsForAdmin(orderDetails?._id));
+        dispatch(getAllOrdersForAdmin());
+        setFormData(initialFormData);
+      }
+    });
   };
 
   return (
-    <DialogContent className="sm:max-w-[600px]">
+    <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
       <DialogTitle>Order Admin Details</DialogTitle>
       <div className="grid gap-6">
         <div className="grid gap-2">
@@ -67,6 +86,14 @@ const AdminOrderDetailsView = ({ orderDetails, username }) => {
               <Badge
                 className={`py-1 px-3 ${
                   orderDetails?.orderStatus === "confirmed"
+                    ? "bg-green-500"
+                    : orderDetails?.orderStatus === "rejected"
+                    ? "bg-red-500"
+                    : orderDetails?.orderStatus === "inProcess"
+                    ? "bg-yellow-500"
+                    : orderDetails?.orderStatus === "inShipping"
+                    ? "bg-blue-500"
+                    : orderDetails?.orderStatus === "delivered"
                     ? "bg-green-500"
                     : "bg-black"
                 }`}
@@ -145,6 +172,7 @@ const AdminOrderDetailsView = ({ orderDetails, username }) => {
                 componentType: "select",
                 options: [
                   { id: "pending", label: "Pending" },
+                  { id: "confirmed", label: "Confirmed" },
                   { id: "inProcess", label: "In Process" },
                   { id: "inShipping", label: "In Shipping" },
                   { id: "delivered", label: "Delivered" },
