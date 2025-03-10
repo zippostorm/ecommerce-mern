@@ -10,6 +10,7 @@ import shopCartRouter from "./routes/shop/cart.route.js";
 import shopAddressRouter from "./routes/shop/address.route.js";
 import shopOrderRouter from "./routes/shop/order.route.js";
 import shopSearchRouter from "./routes/shop/search.route.js";
+import shopReviewRouter from "./routes/shop/review.route.js";
 
 mongoose
   .connect(
@@ -46,5 +47,6 @@ app.use("/api/shop/cart", shopCartRouter);
 app.use("/api/shop/address", shopAddressRouter);
 app.use("/api/shop/order", shopOrderRouter);
 app.use("/api/shop/search", shopSearchRouter);
+app.use("/api/shop/review", shopReviewRouter);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

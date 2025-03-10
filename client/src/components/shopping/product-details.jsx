@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
@@ -9,14 +9,23 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart, fetchCartItems } from "@/store/shop/cart";
 import { useToast } from "@/hooks/use-toast";
 import { setProductDetails } from "@/store/shop/products";
+import { Label } from "../ui/label";
+import StarRatingComponent from "../common/star-rating";
 
 const ProductDetailsDialog = ({ open, setOpen, productDetails }) => {
   const dispatch = useDispatch();
+
+  const [reviewMsg, setReviewMsg] = useState("");
+  const [rating, setRating] = useState(0);
 
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
 
   const { toast } = useToast();
+
+  const handleRatingChange = (getRating) => {
+    setRating(getRating);
+  };
 
   const handleAddToCart = (getCurrentProductId, getTotalStock) => {
     let getCartItems = cartItems.items || [];
@@ -188,8 +197,21 @@ const ProductDetailsDialog = ({ open, setOpen, productDetails }) => {
                 </div>
               </div>
             </div>
-            <div className="mt-6 flex gap-2">
-              <Input placeholder="Write a review..." type="text" />
+            <div className="mt-10 flex flex-col gap-2">
+              <Label>Write a review</Label>
+              <div className="flex">
+                <StarRatingComponent
+                  rating={rating}
+                  handleRatingChange={handleRatingChange}
+                />
+              </div>
+              <Input
+                name="reviewMsg"
+                value={reviewMsg}
+                onChange={(e) => setReviewMsg(e.target.value)}
+                placeholder="Write a review..."
+                type="text"
+              />
               <Button>Submit</Button>
             </div>
           </div>
