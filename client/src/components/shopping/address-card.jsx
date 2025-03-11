@@ -8,6 +8,7 @@ const AddressCard = ({
   handleDeleteAddress,
   handleEditAddress,
   setCurrentSelectedAddress,
+  selectedId,
 }) => {
   return (
     <Card
@@ -16,13 +17,22 @@ const AddressCard = ({
           ? () => setCurrentSelectedAddress(addressInfo)
           : null
       }
+      className={`cursor-pointer border-red-700 ${
+        selectedId?._id === addressInfo?._id
+          ? "border-red-900 border-[4px]"
+          : "border-black"
+      }`}
     >
       <CardContent className="grid gap-4 p-4">
-        <Label>Address: {addressInfo?.address}</Label>
-        <Label>City: {addressInfo?.city}</Label>
-        <Label>Pincode: {addressInfo?.pincode}</Label>
-        <Label>Phone: {addressInfo?.phone}</Label>
-        <Label>Notes: {addressInfo?.notes}</Label>
+        <Label className="cursor-pointer">
+          Address: {addressInfo?.address}
+        </Label>
+        <Label className="cursor-pointer">City: {addressInfo?.city}</Label>
+        <Label className="cursor-pointer">
+          Pincode: {addressInfo?.pincode}
+        </Label>
+        <Label className="cursor-pointer">Phone: {addressInfo?.phone}</Label>
+        <Label className="cursor-pointer">Notes: {addressInfo?.notes}</Label>
       </CardContent>
       <CardFooter className="p-3 flex justify-between">
         <Button onClick={() => handleEditAddress(addressInfo)}>Edit</Button>
