@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { setProductDetails } from "@/store/shop/products";
 import { Label } from "../ui/label";
 import StarRatingComponent from "../common/star-rating";
+import { addReview, getReviews } from "@/store/shop/review";
 
 const ProductDetailsDialog = ({ open, setOpen, productDetails }) => {
   const dispatch = useDispatch();
@@ -20,6 +21,7 @@ const ProductDetailsDialog = ({ open, setOpen, productDetails }) => {
 
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
+  const { reviews } = useSelector((state) => state.shopReview);
 
   const { toast } = useToast();
 
@@ -67,7 +69,42 @@ const ProductDetailsDialog = ({ open, setOpen, productDetails }) => {
   const handleDialogClose = () => {
     setOpen(false);
     dispatch(setProductDetails());
+    setReviewMsg("");
+    setRating(0);
   };
+
+  const handleAddReview = () => {
+    dispatch(
+      addReview({
+        productId: productDetails?._id,
+        userId: user?.id,
+        userName: user?.username,
+        reviewMessage: reviewMsg,
+        reviewValue: rating,
+      })
+    ).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(getReviews(productDetails?._id));
+        setReviewMsg("");
+        setRating(0);
+        toast({
+          title: "Review added successfully!",
+        });
+      }
+    });
+  };
+
+  const avarageReview =
+    reviews && reviews.length > 0
+      ? reviews.reduce((sum, reviewItem) => sum + reviewItem.reviewValue, 0) /
+        reviews.length
+      : 0;
+
+  useEffect(() => {
+    if (productDetails !== null) {
+      dispatch(getReviews(productDetails?._id));
+    }
+  }, [productDetails]);
 
   return (
     <Dialog open={open} onOpenChange={handleDialogClose}>
@@ -105,13 +142,14 @@ const ProductDetailsDialog = ({ open, setOpen, productDetails }) => {
           </div>
           <div className="flex items-center gap-2 mt-2">
             <div className="flex items-center gap-0.5">
-              <StarIcon className="w-5 h-5 fill-primary" />
-              <StarIcon className="w-5 h-5 fill-primary" />
-              <StarIcon className="w-5 h-5 fill-primary" />
-              <StarIcon className="w-5 h-5 fill-primary" />
-              <StarIcon className="w-5 h-5 fill-white" />
+              <StarRatingComponent
+                rating={avarageReview}
+                isInteractive={false}
+              />
             </div>
-            <span className="text-muted-foreground">(4)</span>
+            <span className="text-muted-foreground">
+              ({avarageReview.toFixed(2)})
+            </span>
           </div>
           <div className="mt-5 mb-5">
             {productDetails?.totalStock === 0 ? (
@@ -136,73 +174,41 @@ const ProductDetailsDialog = ({ open, setOpen, productDetails }) => {
           <div className="max-h-[300px] overflow-auto">
             <h2 className="text-xl font-bold mb-4">Reviews</h2>
             <div className="grid gap-6">
-              <div className="flex gap-4">
-                <Avatar className="w-10 h-10 border">
-                  <AvatarFallback>SM</AvatarFallback>
-                </Avatar>
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold">Nikita Litvinchuk</h3>
+              {reviews && reviews.length > 0 ? (
+                reviews.map((reviewItem) => (
+                  <div className="flex gap-4">
+                    <Avatar className="w-10 h-10 border">
+                      <AvatarFallback>
+                        {reviewItem?.userName[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="grid gap-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold">{reviewItem?.userName}</h3>
+                      </div>
+                      <div className="flex items-center gap-0.5">
+                        <StarRatingComponent
+                          rating={reviewItem?.reviewValue}
+                          isInteractive={false}
+                        />
+                      </div>
+                      <p className="text-muted-foreground">
+                        {reviewItem?.reviewMessage}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-0.5">
-                    <StarIcon className="w-5 h-5 fill-primary" />
-                    <StarIcon className="w-5 h-5 fill-primary" />
-                    <StarIcon className="w-5 h-5 fill-primary" />
-                    <StarIcon className="w-5 h-5 fill-primary" />
-                    <StarIcon className="w-5 h-5 fill-white" />
-                  </div>
-                  <p className="text-muted-foreground">
-                    This is an awesome product. But not so good for 5 stars!
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <Avatar className="w-10 h-10 border">
-                  <AvatarFallback>SM</AvatarFallback>
-                </Avatar>
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold">Nikita Litvinchuk</h3>
-                  </div>
-                  <div className="flex items-center gap-0.5">
-                    <StarIcon className="w-5 h-5 fill-primary" />
-                    <StarIcon className="w-5 h-5 fill-primary" />
-                    <StarIcon className="w-5 h-5 fill-primary" />
-                    <StarIcon className="w-5 h-5 fill-primary" />
-                    <StarIcon className="w-5 h-5 fill-white" />
-                  </div>
-                  <p className="text-muted-foreground">
-                    This is an awesome product. But not so good for 5 stars!
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <Avatar className="w-10 h-10 border">
-                  <AvatarFallback>SM</AvatarFallback>
-                </Avatar>
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold">Nikita Litvinchuk</h3>
-                  </div>
-                  <div className="flex items-center gap-0.5">
-                    <StarIcon className="w-5 h-5 fill-primary" />
-                    <StarIcon className="w-5 h-5 fill-primary" />
-                    <StarIcon className="w-5 h-5 fill-primary" />
-                    <StarIcon className="w-5 h-5 fill-primary" />
-                    <StarIcon className="w-5 h-5 fill-white" />
-                  </div>
-                  <p className="text-muted-foreground">
-                    This is an awesome product. But not so good for 5 stars!
-                  </p>
-                </div>
-              </div>
+                ))
+              ) : (
+                <h1>No Reviews</h1>
+              )}
             </div>
             <div className="mt-10 flex flex-col gap-2">
               <Label>Write a review</Label>
-              <div className="flex">
+              <div className="flex gap-1">
                 <StarRatingComponent
                   rating={rating}
                   handleRatingChange={handleRatingChange}
+                  isInteractive={true}
                 />
               </div>
               <Input
@@ -212,7 +218,12 @@ const ProductDetailsDialog = ({ open, setOpen, productDetails }) => {
                 placeholder="Write a review..."
                 type="text"
               />
-              <Button>Submit</Button>
+              <Button
+                onClick={handleAddReview}
+                disabled={reviewMsg.trim() === ""}
+              >
+                Submit
+              </Button>
             </div>
           </div>
         </div>
